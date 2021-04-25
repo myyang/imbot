@@ -56,7 +56,7 @@ func sdkClient(r *gin.Engine) {
 
 func customClient(r *gin.Engine) {
 	// maybe for debugging and fallback.
-	r.POST(larkPath, func(c *gin.Context) { New().handleHttp(c) })
+	r.POST(larkPath, New().handleHttp)
 }
 
 // New return lark bot instance.
