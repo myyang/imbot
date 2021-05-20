@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -47,8 +48,8 @@ func New() *Slack {
 	}
 
 	singleton = &Slack{
-		api:           slack.New(os.Getenv("SLACK_TOKEN")),
-		signingSecret: os.Getenv("SLACK_SIGNING_SECRET"),
+		api:           slack.New(os.Getenv("SLACK_TOKEN")), // OAuth Token
+		signingSecret: os.Getenv("SLACK_SIGNING_SECRET"),   // App Sign Secret
 	}
 	return singleton
 }
@@ -129,15 +130,21 @@ type SlackLogger struct {
 }
 
 func (s *SlackLogger) Debugf(tmpl string, args ...interface{}) {
-	s.s.api.PostMessage(
+	_, _, err := s.s.api.PostMessage(
 		os.Getenv("SLACK_LOG_CHANNEL"),
 		slack.MsgOptionText(fmt.Sprintf(tmpl, args...), false),
 	)
+	if err != nil {
+		log.Printf("Debugf error: %v\n", err)
+	}
 }
 
 func (s *SlackLogger) Infof(tmpl string, args ...interface{}) {
-	s.s.api.PostMessage(
+	_, _, err := s.s.api.PostMessage(
 		s.opt["channel_id"].(string),
 		slack.MsgOptionText(fmt.Sprintf(tmpl, args...), false),
 	)
+	if err != nil {
+		log.Printf("Debugf error: %v\n", err)
+	}
 }
