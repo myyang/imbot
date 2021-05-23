@@ -116,6 +116,8 @@ func (s *Slack) handleHttp(c *gin.Context) {
 	}
 }
 
+// Logger returns a logger that wraps slack instance and set logging target to
+// slack channel.
 func (s *Slack) Logger(opt map[string]interface{}) (l *SlackLogger) {
 	l = &SlackLogger{
 		s:   s,
@@ -124,11 +126,14 @@ func (s *Slack) Logger(opt map[string]interface{}) (l *SlackLogger) {
 	return
 }
 
+// SlackLogger wraps slack instance and set logging target to slack channel.
 type SlackLogger struct {
 	s   *Slack
 	opt map[string]interface{}
 }
 
+// Debugf adapts fmt.Printf(string, ...interface{}) and log to channel which is
+// defined by SLACK_LOG_CHANNEL env.
 func (s *SlackLogger) Debugf(tmpl string, args ...interface{}) {
 	_, _, err := s.s.api.PostMessage(
 		os.Getenv("SLACK_LOG_CHANNEL"),
@@ -139,12 +144,21 @@ func (s *SlackLogger) Debugf(tmpl string, args ...interface{}) {
 	}
 }
 
+// Infof adapts fmt.Printf(string, ...interface{}) and log to channel which the
+// message is comming from and @ the sending user.
 func (s *SlackLogger) Infof(tmpl string, args ...interface{}) {
 	_, _, err := s.s.api.PostMessage(
 		s.opt["channel_id"].(string),
 		slack.MsgOptionText(fmt.Sprintf(tmpl, args...), false),
 	)
 	if err != nil {
-		log.Printf("Debugf error: %v\n", err)
+		log.Printf("Printf error: %v\n", err)
 	}
+}
+
+// Write log to channel which the message is comming from and @ the sending user
+// by sending bytes message.
+func (s *SlackLogger) Write(msg []byte) (int, error) {
+	s.Infof(string(msg))
+	return len(msg), nil
 }
