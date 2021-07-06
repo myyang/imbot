@@ -2,9 +2,8 @@ package log
 
 import "io"
 
-const (
-	CtxLogger = "_ctx_logger_"
-)
+// CtxLogger as context key.
+var CtxLogger struct{}
 
 // Logger is shared interface for imbot internally.
 type Logger interface {
