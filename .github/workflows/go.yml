@@ -18,14 +18,21 @@ jobs:
       with:
         go-version: 1.15
 
+    - name: Test env
+      env: 
+        REPO_SECRET_TEST: ${{ secrets.REPO_SECRET_TEST }}
+        ENV_SECRET_TEST: ${{ secrets.ENV_SECRET_TEST }}
+      run: |
+        echo "repo: $REPO_SECRET_TEST ; env: $ENV_SECRET_TEST"
+
     - name: Test
-      run: go test -v ./...
       env: 
         LARK_APP_ID: ${{ secrets.LARK_APP_ID }}
         LARK_APP_SECRET: ${{ secrets.LARK_APP_SECRET }}
         LARK_MSG_TOKEN: ${{ secrets.LARK_MSG_TOKEN }}
         SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
         SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+      run: go test -v ./...
       
     - name: Build
       run: go build -v ./...
