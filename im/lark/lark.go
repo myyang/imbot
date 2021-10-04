@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 
@@ -19,6 +18,7 @@ import (
 	lEventGin "github.com/larksuite/oapi-sdk-go/event/http/gin"
 
 	botCmd "github.com/myyang/imbot/commands"
+	botCfg "github.com/myyang/imbot/config"
 	botLog "github.com/myyang/imbot/log"
 )
 
@@ -121,7 +121,7 @@ func (l *Lark) validate(msg map[string]interface{}) bool {
 		return false
 	}
 
-	if token, ok := msg["token"]; ok && token.(string) == os.Getenv("LARK_MSG_TOKEN") {
+	if token, ok := msg["token"]; ok && token.(string) == botCfg.Config.GetString("LARK_MSG_TOKEN") {
 		return true
 	}
 
@@ -201,7 +201,7 @@ func (l *Lark) parseEvent(msg map[string]interface{}) {
 	botCmd.Execute(ctx, strings.Split(strings.Trim(literal, " "), " "))
 }
 
-func (l *Lark) botLog(msg string) { l.botSay(os.Getenv("LARK_LOG_CHAT_ID"), msg) }
+func (l *Lark) botLog(msg string) { l.botSay(botCfg.Config.GetString("LARK_LOG_CHAT_ID"), msg) }
 
 func (l *Lark) botSay(channelID string, msg string) {
 	body := map[string]interface{}{

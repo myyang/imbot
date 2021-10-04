@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/slack-go/slack/slackevents"
 
 	botCmd "github.com/myyang/imbot/commands"
+	botCfg "github.com/myyang/imbot/config"
 	botLog "github.com/myyang/imbot/log"
 )
 
@@ -48,8 +48,8 @@ func New() *Slack {
 	}
 
 	singleton = &Slack{
-		api:           slack.New(os.Getenv("SLACK_TOKEN")), // OAuth Token
-		signingSecret: os.Getenv("SLACK_SIGNING_SECRET"),   // App Sign Secret
+		api:           slack.New(botCfg.Config.GetString("SLACK_TOKEN")), // OAuth Token
+		signingSecret: botCfg.Config.GetString("SLACK_SIGNING_SECRET"),   // App Sign Secret
 	}
 	return singleton
 }
@@ -136,7 +136,7 @@ type SlackLogger struct {
 // defined by SLACK_LOG_CHANNEL env.
 func (s *SlackLogger) Debugf(tmpl string, args ...interface{}) {
 	_, _, err := s.s.api.PostMessage(
-		os.Getenv("SLACK_LOG_CHANNEL"),
+		botCfg.Config.GetString("SLACK_LOG_CHANNEL"),
 		slack.MsgOptionText(fmt.Sprintf(tmpl, args...), false),
 	)
 	if err != nil {
